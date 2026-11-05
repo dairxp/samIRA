@@ -1,0 +1,27 @@
+[project]
+name = "samira"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Aldair Maquera", email = "harperafterhours@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "charset-normalizer>=3.5.2",
+    "ipykernel>=7.4.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.11.2",
+    "nbformat>=5.11.1",
+    "numpy>=2.5.4",
+    "pandas>=3.1.1",
+    "pyarrow>=26.0.1",
+    "seaborn>=0.13.2",
+]
+
+[project.scripts]
+samira = "samira:main"
+
+[build-system]
+requires = ["uv_build>=0.12.13,<0.13.0"]
+build-backend = "uv_build"

@@ -1,0 +1,109 @@
+venv/
+env/
+.env/
+ENV/
+env.bak/
+venv.bak/
+.uv/
+
+# ------------------------------------------------------------------------------
+# 2. BYTECODE Y ARCHIVOS GENERADOS POR PYTHON
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Ignorar archivos en la carpeta de datos crudos (excepto el archivo .gitkeep)
+data/raw/*
+!data/raw/.gitkeep
+
+# Ignorar archivos procesados generados (CSVs y Parquets masivos)
+data/processed/*
+!data/processed/.gitkeep
+
+# Ignorar archivos de datos sueltos en raíz de data/
+data/*.csv
+data/*.parquet
+
+# Formatos de datos pesados y binarios de persistencia
+*.parquet
+*.feather
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.dta
+*.sav
+*.sqlite
+*.sqlite3
+*.db
+
+# Archivos comprimidos de descarga masiva
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+credentials/
+secrets/
+token*.json
+client_secrets*.json
+
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+*.log
+scratch/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editores e IDEs
+.idea/
+*.swp
+*.swo
+*~

@@ -1,0 +1,6 @@
+﻿campo,ubigeo,valor_anterior,valor_nuevo,filas_afectadas,justificacion
+distrito,210208,MU�ANI,MUÑANI,1305,Reparación de caracter de sustitución (U+FFFD) basado en catálogo oficial UBIGEO INEI (MUÑANI)
+distrito,210806,NU�OA,NUÑOA,1237,Reparación de caracter de sustitución (U+FFFD) basado en catálogo oficial UBIGEO INEI (NUÑOA)
+distrito,210109,MA�AZO,MAÑAZO,1209,Reparación de caracter de sustitución (U+FFFD) basado en catálogo oficial UBIGEO INEI (MAÑAZO)
+ubigeo,TODOS,object / int inferido,"string (6 caracteres, zfill)",126118,Preservar formato estándar UBIGEO de 6 dígitos requerido para uniones cartográficas INEI
+ano_semana,TODOS,No existía,YYYY-Www (string),126118,Identificador temporal estandarizado para modelado de series de tiempo epidemiológicas
