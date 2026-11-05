@@ -1,0 +1,21 @@
+ambito,horizonte_h,modelo,estrategia_horizonte,n_total,brotes_reales,alertas_predichas,TP,FP,FN,TN,precision,sensibilidad_recall,especificidad,f1_score,tasa_falsa_alarma,proporcion_alertas_falsas,TP_upper95,FP_upper95,sensibilidad_upper95,precision_upper95
+PROVINCIAL,1,ETS / Holt-Winters,N/A,689,20,19,3,16,17,653,0.1579,0.15,0.9761,0.1538,0.0239,0.8421,,,,
+PROVINCIAL,1,LightGBM Global,Directa,689,20,1,1,0,19,669,1.0,0.05,1.0,0.0952,0.0,0.0,17.0,327.0,0.85,0.0494
+PROVINCIAL,1,LightGBM Independiente,Directa,689,20,1,0,1,20,668,0.0,0.0,0.9985,0.0,0.0015,1.0,19.0,240.0,0.95,0.0734
+PROVINCIAL,1,Naive,N/A,689,20,17,3,14,17,655,0.1765,0.15,0.9791,0.1622,0.0209,0.8235,,,,
+PROVINCIAL,1,Seasonal Naive,N/A,689,20,19,3,16,17,653,0.1579,0.15,0.9761,0.1538,0.0239,0.8421,,,,
+PROVINCIAL,1,XGBoost Global,Directa,689,20,2,1,1,19,668,0.5,0.05,0.9985,0.0909,0.0015,0.5,19.0,371.0,0.95,0.0487
+PROVINCIAL,4,ETS / Holt-Winters,N/A,689,20,19,3,16,17,653,0.1579,0.15,0.9761,0.1538,0.0239,0.8421,,,,
+PROVINCIAL,4,LightGBM Global Directo,Directa,689,20,2,0,2,20,667,0.0,0.0,0.997,0.0,0.003,1.0,18.0,442.0,0.9,0.0391
+PROVINCIAL,4,LightGBM Global Recursivo,Recursiva,689,20,1,0,1,20,668,0.0,0.0,0.9985,0.0,0.0015,1.0,19.0,433.0,0.95,0.042
+PROVINCIAL,4,Naive,N/A,689,20,20,1,19,19,650,0.05,0.05,0.9716,0.05,0.0284,0.95,,,,
+PROVINCIAL,4,Seasonal Naive,N/A,689,20,19,3,16,17,653,0.1579,0.15,0.9761,0.1538,0.0239,0.8421,,,,
+PROVINCIAL,4,XGBoost Global Directo,Directa,689,20,3,0,3,20,666,0.0,0.0,0.9955,0.0,0.0045,1.0,18.0,442.0,0.9,0.0391
+REGIONAL,1,ETS / Holt-Winters,N/A,53,0,0,0,0,0,53,0.0,0.0,1.0,0.0,0.0,0.0,,,,
+REGIONAL,1,LightGBM Regional,Directa,53,0,0,0,0,0,53,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0
+REGIONAL,1,Naive,N/A,53,0,0,0,0,0,53,0.0,0.0,1.0,0.0,0.0,0.0,,,,
+REGIONAL,1,Seasonal Naive,N/A,53,0,0,0,0,0,53,0.0,0.0,1.0,0.0,0.0,0.0,,,,
+REGIONAL,4,ETS / Holt-Winters,N/A,53,0,0,0,0,0,53,0.0,0.0,1.0,0.0,0.0,0.0,,,,
+REGIONAL,4,LightGBM Regional Directo,Directa,53,0,0,0,0,0,53,0.0,0.0,1.0,0.0,0.0,0.0,0.0,11.0,0.0,0.0
+REGIONAL,4,Naive,N/A,53,0,0,0,0,0,53,0.0,0.0,1.0,0.0,0.0,0.0,,,,
+REGIONAL,4,Seasonal Naive,N/A,53,0,0,0,0,0,53,0.0,0.0,1.0,0.0,0.0,0.0,,,,

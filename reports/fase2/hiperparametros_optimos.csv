@@ -1,0 +1,5 @@
+﻿algoritmo,horizonte_h,estrategia,configs_evaluadas,criterio_seleccion,wape_validacion_pct,parametros_optimos,tiempo_segundos,random_seed,version_libreria
+LightGBM,1,Directa,5,Min WAPE (%) en Validación (2023-2024),18.232,"{'n_estimators': 200, 'learning_rate': 0.05, 'num_leaves': 31, 'subsample': 1.0}",0.98,42,4.7.0
+XGBoost,1,Directa,5,Min WAPE (%) en Validación (2023-2024),18.589,"{'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 6, 'subsample': 0.8}",1.13,42,3.4.1
+LightGBM,4,Directa,5,Min WAPE (%) en Validación (2023-2024),22.922,"{'n_estimators': 300, 'learning_rate': 0.03, 'num_leaves': 15, 'subsample': 0.8}",0.79,42,4.7.0
+XGBoost,4,Directa,5,Min WAPE (%) en Validación (2023-2024),22.657,"{'n_estimators': 300, 'learning_rate': 0.03, 'max_depth': 4, 'subsample': 0.8}",0.98,42,3.4.1

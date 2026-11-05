@@ -1,0 +1,21 @@
+ambito,horizonte_h,estrategia_horizonte,modelo,n_total,brotes_reales,brotes_predichos,TP,FP,FN,TN,precision,recall_sensibilidad,f1_score,exactitud,tasa_falsa_alarma,tasa_alerta_perdida
+PROVINCIAL,1,N/A,Naive,689,20,17,3,14,17,655,0.1765,0.15,0.1622,0.955,0.0209,0.85
+PROVINCIAL,1,N/A,ETS / Holt-Winters,689,20,19,3,16,17,653,0.1579,0.15,0.1538,0.9521,0.0239,0.85
+PROVINCIAL,1,N/A,Seasonal Naive,689,20,19,3,16,17,653,0.1579,0.15,0.1538,0.9521,0.0239,0.85
+PROVINCIAL,1,Directa,LightGBM Global,689,20,1,1,0,19,669,1.0,0.05,0.0952,0.9724,0.0,0.95
+PROVINCIAL,1,Directa,XGBoost Global,689,20,2,1,1,19,668,0.5,0.05,0.0909,0.971,0.0015,0.95
+PROVINCIAL,1,Directa,LightGBM Independiente,689,20,1,0,1,20,668,0.0,0.0,0.0,0.9695,0.0015,1.0
+PROVINCIAL,4,N/A,ETS / Holt-Winters,689,20,19,3,16,17,653,0.1579,0.15,0.1538,0.9521,0.0239,0.85
+PROVINCIAL,4,N/A,Seasonal Naive,689,20,19,3,16,17,653,0.1579,0.15,0.1538,0.9521,0.0239,0.85
+PROVINCIAL,4,N/A,Naive,689,20,20,1,19,19,650,0.05,0.05,0.05,0.9448,0.0284,0.95
+PROVINCIAL,4,Directa,LightGBM Global Directo,689,20,2,0,2,20,667,0.0,0.0,0.0,0.9681,0.003,1.0
+PROVINCIAL,4,Directa,XGBoost Global Directo,689,20,3,0,3,20,666,0.0,0.0,0.0,0.9666,0.0045,1.0
+PROVINCIAL,4,Recursiva,LightGBM Global Recursivo,689,20,1,0,1,20,668,0.0,0.0,0.0,0.9695,0.0015,1.0
+REGIONAL,1,Directa,LightGBM Regional,53,0,0,0,0,0,53,0.0,0.0,0.0,1.0,0.0,0.0
+REGIONAL,1,N/A,ETS / Holt-Winters,53,0,0,0,0,0,53,0.0,0.0,0.0,1.0,0.0,0.0
+REGIONAL,1,N/A,Naive,53,0,0,0,0,0,53,0.0,0.0,0.0,1.0,0.0,0.0
+REGIONAL,1,N/A,Seasonal Naive,53,0,0,0,0,0,53,0.0,0.0,0.0,1.0,0.0,0.0
+REGIONAL,4,Directa,LightGBM Regional Directo,53,0,0,0,0,0,53,0.0,0.0,0.0,1.0,0.0,0.0
+REGIONAL,4,N/A,ETS / Holt-Winters,53,0,0,0,0,0,53,0.0,0.0,0.0,1.0,0.0,0.0
+REGIONAL,4,N/A,Naive,53,0,0,0,0,0,53,0.0,0.0,0.0,1.0,0.0,0.0
+REGIONAL,4,N/A,Seasonal Naive,53,0,0,0,0,0,53,0.0,0.0,0.0,1.0,0.0,0.0

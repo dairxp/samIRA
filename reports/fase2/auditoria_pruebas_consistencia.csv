@@ -1,0 +1,11 @@
+id_prueba,nombre_prueba,resultado,valor_esperado,valor_observado,detalles_registros
+TEST-01,Reconciliación de suma provincial vs. regional (Panel 2025),PASS,"69,412.00 episodios","Prov: 69,412.00 | Reg: 69,412.00",Ninguno
+TEST-02,Reconciliación suma y_true predicciones LightGBM Global h=1 vs. panel real,PASS,"69,412.00 episodios","69,412.00 episodios",Ninguno
+TEST-03,Cumplimiento estricto de identidad matemática WAPE = 100 * MAE * N / sum(y),PASS,diff < 1e-5 para todos los modelos,Max diff: 0.00000000,Cumplido en las 20 configuraciones evaluadas
+TEST-04,Unicidad de clave primaria canónica en predicciones_2025.csv,PASS,0 registros duplicados,0 registros duplicados,"Clave: (ambito, entidad, ano, semana, horizonte_h, modelo, estrategia)"
+TEST-05,Ausencia de NaN en target evaluable (es_evaluable == True),PASS,0 filas evaluables con NaN,0 filas evaluables con NaN,Ninguno
+TEST-06,Control de no fuga temporal en horizonte h=4 directo,PASS,"Lags a t+1, t+2, t+3 ausentes en variables predictoras",Verificado programáticamente en pipeline de features,"Features en t usan lags a partir de shift(0), target en shift(-4). Lags 1..3 futuros excluidos."
+TEST-07,Consistencia de suma en matrices de confusión (TP+FP+FN+TN == N),PASS,Diferencia de sumas = 0,Diferencia de sumas = 0,Verificado en las 20 configuraciones de alerta
+TEST-08,Consistencia documental: Tabla Sección 13 del informe vs. Panel real 2025,FAIL,"69,412.00 episodios observados en 2025","53,735.00 episodios reportados en tabla Sección 13","DISCREPANCIA DOCUMENTAL DETECTADA: Diferencia de -15,677 episodios (-22.58%)"
+TEST-09,Independencia estadística ETS vs. Seasonal Naive,FAIL,ETS con predicciones independientes generadas por Holt-Winters,"ETS y Seasonal Naive son 100% idénticos en todas las filas (8,692/8,692)",FALLO DETECTADO: AttributeError en forecast().iloc[-1] atrapado silenciosamente en 04_train_baselines.py (L139-L142) reasignando pred_snaive
+TEST-10,Fidelidad de resultados_prueba_2025.csv respecto al recálculo directo,PASS,Diferencia de redondeo < 0.01% en WAPE,Max diff WAPE: 0.0005%,resultados_prueba_2025.csv coincide exactamente con las predicciones evaluadas

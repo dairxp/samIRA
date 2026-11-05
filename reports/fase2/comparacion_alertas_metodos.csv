@@ -1,0 +1,4 @@
+metodo_alerta,criterio_activacion,ambito,particion,semanas_alta_notif_reales,alertas_emitidas,verdaderos_positivos_tp,falsos_positivos_fp,falsos_negativos_fn,verdaderos_negativos_tn,precision_pct,sensibilidad_recall_pct,f1_score,tasa_falsa_alarma_pct,conclusion_operativa
+Pronóstico Puntual (Conservador),y_pred >= P75_histórico,PROVINCIAL,test_2025,20,1,1,0,19,669,100.0,5.0,0.0952,0.0,Inviable por subnotificación (pierde el 95% de semanas críticas)
+Límite Superior IC 95% (Extremo),y_pred_upper_95 >= P75_histórico,PROVINCIAL,test_2025,20,344,17,327,3,342,4.94,85.0,0.0934,48.88,"Inviable por fatiga de alarma (327 falsas alarmas, 94.5% error en alertas)"
+Probabilístico Sintonizado en Validación (P70),y_pred + q_val_P70 >= P75_histórico,PROVINCIAL,test_2025,20,27,5,22,15,647,18.52,25.0,0.2128,3.29,No recomendable (pierde 75% de picos con 22 falsas alarmas; F1=0.21)
