@@ -1,8 +1,6 @@
 """
-================================================================================
 MÓDULO: COMPARACIÓN EMPÍRICA DE ESTRATEGIAS DE IMPUTACIÓN CAUSAL DE RETARDOS
 Proyecto samIRA - Fase 2
-================================================================================
 Compara en la partición de Validación (2023–2024) cuatro estrategias para el
 tratamiento de faltantes en las variables explicativas (retardos):
   A. Retardo estacional (valor de la misma semana del año anterior).

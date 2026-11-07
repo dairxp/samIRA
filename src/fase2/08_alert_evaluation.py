@@ -1,6 +1,5 @@
 """
 FASE 2 - EVALUACIÓN DE UTILIDAD EN PLANIFICACIÓN SANITARIA Y ALERTAS EPIDEMIOLÓGICAS
-==================================================================================
 Evalúa la capacidad de los modelos predictivos para anticipar semanas de alta notificación
 o brotes según la metodología oficial del Canal Endémico (Bortman / CDC-MINSA).
 

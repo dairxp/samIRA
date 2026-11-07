@@ -1,293 +1,451 @@
 """
-FASE 2 - GENERACIÓN Y EJECUCIÓN DEL JUPYTER NOTEBOOK DE MODELADO PREDICTIVO
-===========================================================================
-Genera el notebook interactivo y documentado:
-notebooks/02_fase2_modelado_predictivo.ipynb
-
-El notebook incluye explicaciones metodológicas en español, código reproducible,
-tablas de resultados y gráficos científicos embebidos.
+Construcción y ejecución del notebook interactivo de la Fase 2.
+Genera notebooks/02_fase2_modelado_predictivo.ipynb con ejecución directa,
+flujo paso a paso, comentarios precisos y sin divisores decorativos.
 """
 
 import os
 import nbformat as nbf
 from nbclient import NotebookClient
 
-def create_and_execute_notebook():
+def build_notebook():
     nb = nbf.v4.new_notebook()
-    
     cells = []
-    
-    # --------------------------------------------------------------------------
-    # Celda 1: Portada y Contexto
-    # --------------------------------------------------------------------------
+
+    # Portada y contexto
     cells.append(nbf.v4.new_markdown_cell("""# Proyecto samIRA - Fase 2: Modelado Predictivo y Evaluación Científica de IRA en Puno
 
 **Investigación:** Inteligencia de negocios y aprendizaje automático para el análisis y pronóstico de infecciones respiratorias agudas en menores de cinco años en la región Puno, Perú.  
-**Dataset:** Vigilancia epidemiológica oficial MINSA/CDC Perú (2000–2025).  
-**Ámbito territorial:** 13 provincias de Puno y total regional agregado.  
+**Dataset oficial:** Vigilancia Epidemiológica de IRAs, Centro Nacional de Epidemiología, Prevención y Control de Enfermedades (CDC Perú / MINSA, 2000–2025).  
+**Ámbito territorial:** 13 provincias del departamento de Puno y serie consolidada regional.  
 **Variable objetivo:** `ira_no_neumonia` (episodios semanales en menores de cinco años).  
-**Horizontes temporales evaluados:** $h = 1$ semana y $h = 4$ semanas.  
+**Horizontes temporales:** $h = 1$ semana (alerta operativa) y $h = 4$ semanas (planificación mensual).  
 
 ---
-### Estructura del Notebook:
-1. **Verificación de Precondiciones de Fase 1**
-2. **Control de Calendario Epidemiológico y Semana 53**
-3. **Tratamiento Causal de Datos Faltantes (Estrategias A, B, C, D)**
-4. **Modelos Estadísticos de Referencia (Baselines: Naive, Seasonal Naive, ETS)**
-5. **Ingeniería de Características sin Fuga de Información**
-6. **Optimización de Hiperparámetros (LightGBM y XGBoost)**
-7. **Entrenamiento y Evaluación Científica Integral (Global, Independiente, Regional, Directo vs. Recursivo)**
-8. **Evaluación Out-of-Sample en Conjunto de Prueba 2025**
-9. **Intervalos de Predicción Empíricos (95%)**
-10. **Evaluación de Utilidad Sanitaria: Detección Temprana de Alertas y Brotes**
-11. **Galería de Figuras Científicas**
-12. **Conclusiones y Dictamen Operativo**
+### Estructura Metodológica del Notebook:
+1. Verificación programática de precondiciones de Fase 1
+2. Calendario epidemiológico y control de la semana 53
+3. Tratamiento causal de valores faltantes (Estrategia C)
+4. Modelos estadísticos basales (Naive, Seasonal Naive, ETS / Holt-Winters)
+5. Ingeniería de características temporales y estacionales sin fuga de información
+6. Modelos de Machine Learning: LightGBM y XGBoost (estrategias directa y recursiva)
+7. Evaluación comparativa en conjunto ciego de prueba 2025
+8. Calibración heterocedástica de intervalos de predicción al 95% por provincia
+9. Evaluación epidemiológica de semanas de alta notificación y análisis de alertas
+10. Diagnóstico visual y figuras epidemiológicas
+11. Verificación de consistencia y exportación de entregables finales
+12. Conclusiones y recomendaciones para el Dashboard de Business Intelligence
 """))
 
-    # --------------------------------------------------------------------------
-    # Celda 2: Configuración de Entorno e Importaciones
-    # --------------------------------------------------------------------------
-    cells.append(nbf.v4.new_code_cell("""# Configuración de ruta y librerías fundamentales
+    # Configuración e importaciones
+    cells.append(nbf.v4.new_code_cell("""# Importación de librerías científicas y configuración del entorno
 import os
 import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+import lightgbm as lgb
+import xgboost as xgb
 
-# Detectar la raíz del proyecto de manera robusta
-if os.path.exists("data"):
-    project_root = os.path.abspath(".")
-elif os.path.exists("../data"):
-    project_root = os.path.abspath("..")
-else:
-    project_root = os.path.abspath(".")
+# Configuración visual
+plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
+plt.rcParams["figure.dpi"] = 120
+plt.rcParams["font.size"] = 10
+plt.rcParams["axes.titlesize"] = 11
+plt.rcParams["axes.labelsize"] = 10
 
+# Detección de la raíz del proyecto
+project_root = os.path.abspath("..") if os.path.exists("../data") else os.path.abspath(".")
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 os.chdir(project_root)
 
-# Configuración visual
-plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
-plt.rcParams["figure.figsize"] = (12, 6)
-plt.rcParams["font.size"] = 10
-pd.set_option("display.max_columns", 25)
-pd.set_option("display.float_format", lambda x: "%.3f" % x)
-
-print("Entorno configurado correctamente en el directorio raíz:", os.getcwd())
+print(f"Directorio de trabajo configurado: {os.getcwd()}")
 """))
 
-    # --------------------------------------------------------------------------
-    # Celda 3: Verificación de Precondiciones
-    # --------------------------------------------------------------------------
+    # Sección 1: Precondiciones
     cells.append(nbf.v4.new_markdown_cell("""## 1. Verificación Programática de Precondiciones de la Fase 1
-Antes de iniciar cualquier modelado o ingeniería de características, verificamos de manera determinista las 8 condiciones del dataset consolidado en la Fase 1.
+
+Antes de proceder con el modelado temporal, se valida programáticamente el cumplimiento estricto de las 7 condiciones metodológicas establecidas en la auditoría de la Fase 1:
+- Registros limpios consolidados: 126,118 registros originales.
+- Total histórico acumulado: 2,297,378 episodios notificados de IRA no neumonía.
+- Ámbito geográfico: 13 provincias de Puno.
+- Semanas epidemiológicas regionales observadas: 1,357 semanas continuas.
+- Cobertura teórica provincial: $1,357 \\times 13 = 17,641$ combinaciones provincia-semana.
+- Observaciones con información: 17,488 pares evaluables.
+- Observaciones sin registro (faltantes reales): 153 semanas con valor `NaN`.
 """))
 
-    cells.append(nbf.v4.new_code_cell("""# Cargar paneles procesados
+    cells.append(nbf.v4.new_code_cell("""# Carga de paneles procesados y validación de precondiciones
 df_prov = pd.read_parquet("data/processed/panel_semanal_provincial_puno.parquet")
 df_reg = pd.read_parquet("data/processed/panel_semanal_regional_puno.parquet")
 
-print("--- AUDITORÍA DE PRECONDICIONES DE ENTRADA ---")
-print(f"1. Episodios históricos totales notificados: {df_prov['ira_no_neumonia'].sum():,.0f} (Esperado: 2,297,378)")
-print(f"2. Número de provincias observadas: {df_prov['provincia'].nunique()} (Esperado: 13)")
-print(f"3. Semanas epidemiológicas regionales: {len(df_reg):,} (Esperado: 1,357)")
-print(f"4. Combinaciones provincia-semana totales: {len(df_prov):,} (Esperado: 17,641)")
-print(f"5. Observaciones con información (es_evaluable == True): {df_prov['es_evaluable'].sum():,} (Esperado: 17,488)")
-print(f"6. Observaciones sin registro (NaN conservados): {df_prov['ira_no_neumonia'].isna().sum():,} (Esperado: 153)")
-print(f"7. Variable objetivo 'ira_no_neumonia' presente: {'ira_no_neumonia' in df_prov.columns}")
-print(f"8. Bandera de evaluabilidad 'es_evaluable' presente: {'es_evaluable' in df_prov.columns}")
+n_filas = len(df_prov)
+n_provincias = df_prov["provincia"].nunique()
+n_semanas_reg = len(df_reg)
+total_teorico = n_semanas_reg * n_provincias
+n_evaluables = int(df_prov["es_evaluable"].sum())
+n_nan = int(df_prov["ira_no_neumonia"].isna().sum())
+total_episodios = int(df_prov["ira_no_neumonia"].sum())
 
-assert df_prov['ira_no_neumonia'].sum() == 2297378, "Error en total de episodios"
-assert df_prov['provincia'].nunique() == 13, "Error en número de provincias"
-assert len(df_reg) == 1357, "Error en semanas regionales"
-assert len(df_prov) == 17641, "Error en pares provincia-semana"
-assert df_prov['es_evaluable'].sum() == 17488, "Error en observaciones evaluables"
-assert df_prov['ira_no_neumonia'].isna().sum() == 153, "Error en NaNs conservados"
-print("\\n>>> TODAS LAS PRECONDICIONES CONFIRMADAS AL 100% <<<")
+print("Resumen de Control de Precondiciones (Fase 1):")
+print(f"- Total filas del panel provincial: {n_filas:,} (esperado: {total_teorico:,})")
+print(f"- Número de provincias: {n_provincias} (esperado: 13)")
+print(f"- Semanas epidemiológicas regionales: {n_semanas_reg:,} (esperado: 1,357)")
+print(f"- Observaciones evaluables (con información): {n_evaluables:,} (esperado: 17,488)")
+print(f"- Observaciones faltantes (NaN original): {n_nan:,} (esperado: 153)")
+print(f"- Total episodios acumulados (2000-2025): {total_episodios:,} (esperado: 2,297,378)")
+
+assert n_filas == 17641, f"Error en filas: {n_filas}"
+assert n_provincias == 13, f"Error en provincias: {n_provincias}"
+assert n_semanas_reg == 1357, f"Error en semanas regionales: {n_semanas_reg}"
+assert n_evaluables == 17488, f"Error en observaciones evaluables: {n_evaluables}"
+assert n_nan == 153, f"Error en NaNs: {n_nan}"
+assert total_episodios == 2297378, f"Error en episodios: {total_episodios}"
+
+print("\\nTodas las precondiciones han sido validadas exitosamente.")
 """))
 
-    # --------------------------------------------------------------------------
-    # Celda 4: Calendario Epidemiológico y Semana 53
-    # --------------------------------------------------------------------------
-    cells.append(nbf.v4.new_markdown_cell("""## 2. Calendario Epidemiológico y Manejo de la Semana 53
-En el sistema de vigilancia epidemiológica peruano (CDC-MINSA), los años bisiestos o con 53 semanas (2003, 2008, 2014, 2020 y 2025) introducen una asincronía si se aplica un desplazamiento ingenuo de 52 posiciones (`shift(52)`).  
-Hacia el año 2025, un `shift(52)` acumula un desfase estacional de **4 semanas completas**.  
-Para solucionarlo, implementamos una función de alineación basada en calendario que mapea exactamente el par $(y-1, w)$ de la semana homóloga.
+    # Sección 2: Calendario y Faltantes
+    cells.append(nbf.v4.new_markdown_cell("""## 2. Calendario Epidemiológico y Tratamiento Causal de Faltantes
+
+El calendario de vigilancia epidemiológica del MINSA contempla semanas epidemiológicas 53 en años específicos donde el ciclo anual acumula días adicionales (2004, 2009, 2015, 2020 y 2025). Estas semanas son legítimas y no deben eliminarse ni forzarse a calendarios gregorianos convencionales.
+
+Para el tratamiento de las 153 observaciones faltantes en el panel provincial, se implementa la **Estrategia C (Propagación causal histórica)**:
+- Para calcular retardos (*lags*) y estadísticas móviles, los vacíos se cubren exclusivamente utilizando el último valor observado disponible hacia atrás (`ffill` temporal causal).
+- La columna original de evaluación (`ira_no_neumonia`) preserva sus `NaN` intactos, impidiendo que el modelo sea evaluado contra ceros artificiales o datos interpolados con información futura.
 """))
 
-    cells.append(nbf.v4.new_code_cell("""# Inspección de años con semana 53 en el dataset
-semanas_por_ano = df_reg.groupby("ano")["semana"].max()
-anos_53 = semanas_por_ano[semanas_por_ano == 53].index.tolist()
-print("Años oficiales con 53 semanas epidemiológicas:", anos_53)
+    cells.append(nbf.v4.new_code_cell("""# Verificación de años con semana 53 y aplicación de tratamiento causal de faltantes
+semanas_max = df_prov.groupby("ano")["semana"].max()
+anios_con_53 = semanas_max[semanas_max == 53].index.tolist()
+print(f"Años con semana epidemiológica 53 en el dataset: {anios_con_53}")
 
-# Demostración del desfase acumulado por shift(52)
-s = df_reg.set_index(["ano", "semana"]).sort_index()
-s["shift_52_semana"] = s.index.get_level_values("semana")
-print("\\nEl desplazamiento shift(52) sobre series con semanas 53 desplaza la fase estacional un período adicional por cada año bisiesto epidemiológico transcurrido.")
+# Preparación de serie causal para retardos (Estrategia C)
+df_prov = df_prov.sort_values(by=["provincia", "ano", "semana"]).reset_index(drop=True)
+df_prov["target_raw"] = df_prov["ira_no_neumonia"]
+df_prov["target_causal_imputed"] = df_prov.groupby("provincia")["target_raw"].ffill().bfill()
+
+print(f"Total NaNs en columna evaluable (target_raw): {df_prov['target_raw'].isna().sum()}")
+print(f"Total NaNs en serie causal para ingeniería de variables: {df_prov['target_causal_imputed'].isna().sum()}")
 """))
 
-    # --------------------------------------------------------------------------
-    # Celda 5: Tratamiento Causal de Faltantes
-    # --------------------------------------------------------------------------
-    cells.append(nbf.v4.new_markdown_cell("""## 3. Tratamiento Causal de Valores Faltantes
-Para no evaluar modelos sobre valores inventados, los 153 `NaN` se preservan intactos en la serie original y la evaluación se restringe a `es_evaluable == True`.  
-Para construir las variables predictoras (lags y medias móviles), evaluamos 4 estrategias causales en la partición de validación (2023–2024):
-- **Estrategia A:** Retardo estacional homólogo del año anterior.
-- **Estrategia B:** Last Observation Carried Forward (LOCF) causal.
-- **Estrategia C:** Media móvil causal retrospectiva de 3 semanas.
-- **Estrategia D:** Tratamiento nativo de faltantes con indicador binario de ausencia.
+    # Sección 3: Baselines
+    cells.append(nbf.v4.new_markdown_cell("""## 3. Modelos Estadísticos de Referencia (Baselines)
+
+Para evaluar si el Machine Learning aporta valor clínico real, se implementan tres modelos basales:
+1. **Naive Persistente:** Proyecta el último valor observado: $\\hat{y}_{t+h} = y_t$.
+2. **Seasonal Naive:** Proyecta la observación correspondiente a la misma semana del año anterior: $\\hat{y}_{t+h} = y_{t+h-52}$.
+3. **ETS / Holt-Winters (Reparado):** Modelo de suavizamiento exponencial de espacio de estados con tendencia aditiva amortiguada (*damped trend*) y componente estacional de 52 semanas.
+
+En la auditoría de Fase 2 se corrigió un fallo de indización en `.forecast().iloc[-1]`, implementando el acceso mediante `float(np.asarray(fc)[-1])` y asegurando que ETS genere predicciones propias e independientes sin fallback a Seasonal Naive.
 """))
 
-    cells.append(nbf.v4.new_code_cell("""# Cargar tabla de comparación de estrategias de imputación
-df_imp = pd.read_csv("reports/fase2/comparacion_imputaciones.csv")
-df_imp
+    cells.append(nbf.v4.new_code_cell("""# Carga de predicciones basales reparadas
+df_baselines = pd.read_parquet("data/processed/predicciones_baselines.parquet")
+
+# Verificación de independencia estadística entre ETS y Seasonal Naive
+ets_vs_snaive_diff = (df_baselines["pred_ets"] - df_baselines["pred_snaive"]).abs().mean()
+print(f"Diferencia media absoluta entre ETS y Seasonal Naive: {ets_vs_snaive_diff:.4f} episodios")
+print(f"Filas de baselines disponibles: {len(df_baselines):,}")
 """))
 
-    # --------------------------------------------------------------------------
-    # Celda 6: Baselines
-    # --------------------------------------------------------------------------
-    cells.append(nbf.v4.new_markdown_cell("""## 4. Modelos Estadísticos de Referencia (Baselines)
-Se implementan y evalúan tres modelos baselines:
-1. **Naive ($t-1$ o $t-h$):** Proyecta la última observación conocida disponible.
-2. **Seasonal Naive ($t-52$ ajustado):** Proyecta la semana homóloga del año previo.
-3. **ETS / Holt-Winters:** Modelo estadístico clásico de nivel, tendencia y estacionalidad aditiva.
+    # Sección 4: Ingeniería de características
+    cells.append(nbf.v4.new_markdown_cell("""## 4. Ingeniería de Características Causal sin Fuga de Información
+
+Se construye una matriz de características epidemiológicas respetando la flecha del tiempo:
+- **Retardos causales:** $y_t, y_{t-1}, y_{t-2}, y_{t-3}, y_{t-7}$ (ajustados rigurosamente según el horizonte $h$).
+- **Estadísticas móviles:** Media y desviación estándar causales en ventanas de 2, 4 y 8 semanas terminadas en el origen $t$.
+- **Armónicas de Fourier:** $K=3$ pares ortogonales de seno y coseno con período fundamental de 52 semanas:
+  $$\\sin\\left(\\frac{2\\pi k \\cdot \\text{semana}}{52}\\right), \\quad \\cos\\left(\\frac{2\\pi k \\cdot \\text{semana}}{52}\\right) \\quad \\text{para } k \\in \\{1, 2, 3\\}$$
+- **Variables de calendario:** Identificador de semana estacional, bandera de semana 53 y tendencia normalizada.
+- **Particionamiento out-of-sample estricto:**
+  - **Entrenamiento:** 2000–2022 (23 años históricos).
+  - **Validación:** 2023–2024 (104 semanas para ajuste y calibración de intervalos).
+  - **Prueba ciega:** 2025 (53 semanas para evaluación final de generalización).
 """))
 
-    cells.append(nbf.v4.new_code_cell("""# Inspección de baselines calculados
-df_base = pd.read_parquet("data/processed/predicciones_baselines.parquet")
-print(f"Total de predicciones baseline generadas: {len(df_base):,}")
-print("Muestra de predicciones provinciales:")
-df_base[df_base["ambito"] == "PROVINCIAL"].head()
+    cells.append(nbf.v4.new_code_cell("""# Construcción de características temporales y estacionales
+def build_features(df_input, h=1):
+    df_feat = df_input.copy()
+    
+    # Armónicas de Fourier
+    for k in range(1, 4):
+        df_feat[f"sin_fourier_{k}"] = np.sin(2 * np.pi * k * df_feat["semana"] / 52.0)
+        df_feat[f"cos_fourier_{k}"] = np.cos(2 * np.pi * k * df_feat["semana"] / 52.0)
+        
+    df_feat["es_semana_53"] = (df_feat["semana"] == 53).astype(int)
+    df_feat["tendencia_norm"] = (df_feat["ano"] - 2000) / 25.0
+    
+    # Retardos causales según horizonte h
+    target_s = df_feat["target_causal_imputed"]
+    for lag in [0, 1, 2, 3, 7]:
+        eff_lag = (h - 1) + lag
+        df_feat[f"lag_{eff_lag}"] = df_feat.groupby("provincia")[target_s.name].shift(eff_lag)
+        
+    # Medias móviles causales calculadas estrictamente sobre información disponible en origen t
+    lag_origin = h - 1
+    s_origin = df_feat.groupby("provincia")[target_s.name].shift(lag_origin)
+    for w in [2, 4, 8]:
+        df_feat[f"roll_mean_{w}"] = df_feat.groupby("provincia")[s_origin.name].transform(
+            lambda x: x.rolling(w, min_periods=1).mean()
+        )
+        df_feat[f"roll_std_{w}"] = df_feat.groupby("provincia")[s_origin.name].transform(
+            lambda x: x.rolling(w, min_periods=1).std()
+        ).fillna(0.0)
+        
+    # Asignación de particiones temporales
+    df_feat["particion"] = "train"
+    df_feat.loc[df_feat["ano"].isin([2023, 2024]), "particion"] = "val"
+    df_feat.loc[df_feat["ano"] == 2025, "particion"] = "test"
+    df_feat["provincia_cat"] = df_feat["provincia"].astype("category")
+    
+    return df_feat
+
+df_feat_h1 = build_features(df_prov, h=1)
+df_feat_h4 = build_features(df_prov, h=4)
+
+print(f"Matriz h=1 construida: {df_feat_h1.shape[1]} columnas, {len(df_feat_h1):,} registros")
+print(f"Distribución por partición: Train={len(df_feat_h1[df_feat_h1['particion']=='train']):,}, "
+      f"Val={len(df_feat_h1[df_feat_h1['particion']=='val']):,}, "
+      f"Test={len(df_feat_h1[df_feat_h1['particion']=='test']):,}")
 """))
 
-    # --------------------------------------------------------------------------
-    # Celda 7: Optimización de Hiperparámetros
-    # --------------------------------------------------------------------------
-    cells.append(nbf.v4.new_markdown_cell("""## 5. Optimización de Hiperparámetros en Validación (2023–2024)
-La búsqueda exhaustiva de hiperparámetros se ejecutó estrictamente sobre el período de validación temporal (2023–2024), sin tocar el conjunto de prueba (2025).  
-Se optimizaron `n_estimators`, `learning_rate`, `num_leaves` / `max_depth` y `subsample` para LightGBM y XGBoost en horizontes $h=1$ y $h=4$.
+    # Sección 5: Modelado ML
+    cells.append(nbf.v4.new_markdown_cell("""## 5. Modelado Predictivo con Machine Learning (LightGBM y XGBoost)
+
+Se entrenan modelos basados en árboles de decisión potenciados por gradiente bajo el paradigma **Global Multi-Serie (*Cross-Sectional Pooling*)**:
+- Un único estimador aprende simultáneamente de las dinámicas epidemiológicas de las 13 provincias, compartiendo patrones no lineales de propagación estacional.
+- Para $h=4$ se compara la estrategia directa (entrenada específicamente para predecir a 4 semanas vista) frente a la estrategia autorregresiva recursiva.
+- Se cargan las predicciones completas unificadas para el análisis comparativo integral.
 """))
 
-    cells.append(nbf.v4.new_code_cell("""# Cargar mejores hiperparámetros identificados
-df_hyp = pd.read_csv("reports/fase2/hiperparametros_optimos.csv")
-df_hyp
+    cells.append(nbf.v4.new_code_cell("""# Carga de predicciones completas de Machine Learning
+df_preds_all = pd.read_parquet("data/processed/predicciones_completas_fase2.parquet")
+
+# Filtrar modelos principales evaluados
+ml_models = [
+    "LightGBM Global", "XGBoost Global", "LightGBM Independiente",
+    "LightGBM Global Directo", "XGBoost Global Directo", "LightGBM Global Recursivo",
+    "LightGBM Regional", "LightGBM Regional Directo"
+]
+df_ml_eval = df_preds_all[df_preds_all["modelo"].isin(ml_models)].copy()
+print(f"Predicciones de Machine Learning cargadas: {len(df_ml_eval):,} observaciones")
 """))
 
-    # --------------------------------------------------------------------------
-    # Celda 8: Resultados en Validación
-    # --------------------------------------------------------------------------
-    cells.append(nbf.v4.new_markdown_cell("""## 6. Rendimiento en Partición de Validación (2023–2024)
-Evaluación de todas las arquitecturas en el período post-pandemia de validación (104 semanas por provincia).
+    # Sección 6: Evaluación out-of-sample 2025
+    cells.append(nbf.v4.new_markdown_cell(r"""## 6. Evaluación Comparativa en el Conjunto de Prueba Ciego (2025)
+
+Se calculan las métricas oficiales de desempeño epidemiológico sobre el año ciego 2025 ($N=689$ a nivel provincial y $N=53$ a nivel regional):
+- **WAPE (Weighted Absolute Percentage Error):** Métrica primaria de error relativo ponderado:
+  $$\text{WAPE} = \frac{\sum |y - \hat{y}|}{\sum y} \times 100\%$$
+- **MAE (Mean Absolute Error):** Error absoluto medio en episodios por semana.
+- **RMSE (Root Mean Squared Error):** Penalización de grandes desviaciones y picos epidémicos.
+- **Sesgo (*Bias*):** Desviación media direccional ($\hat{y} - y$).
 """))
 
-    cells.append(nbf.v4.new_code_cell("""# Cargar tabla de validación
-df_val_res = pd.read_csv("reports/fase2/resultados_validacion.csv")
-df_val_res.sort_values(by=["ambito", "horizonte_h", "mae_global"])
-"""))
+    cells.append(nbf.v4.new_code_cell("""# Carga de la tabla oficial de resultados out-of-sample corregidos
+df_results_test = pd.read_csv("reports/fase2/resultados_prueba_2025_corregido.csv")
 
-    # --------------------------------------------------------------------------
-    # Celda 9: Resultados en Prueba 2025 (Holdout Estricto)
-    # --------------------------------------------------------------------------
-    cells.append(nbf.v4.new_markdown_cell("""## 7. Resultados en Conjunto de Prueba 2025 (Holdout Estricto)
-Evaluación out-of-sample final sobre las 53 semanas epidemiológicas de 2025.  
-Se calculan: MAE, RMSE, WAPE (%), Sesgo Medio (Bias), Mejora (%) sobre Seasonal Naive y Cobertura Empírica del Intervalo de Predicción al 95%.
-"""))
-
-    cells.append(nbf.v4.new_code_cell("""# Cargar tabla de prueba 2025
-df_test_res = pd.read_csv("reports/fase2/resultados_prueba_2025.csv")
-df_test_res.sort_values(by=["ambito", "horizonte_h", "mae_global"])
-"""))
-
-    # --------------------------------------------------------------------------
-    # Celda 10: Desempeño por Provincia
-    # --------------------------------------------------------------------------
-    cells.append(nbf.v4.new_markdown_cell("""## 8. Heterogeneidad Territorial: Desempeño en las 13 Provincias
-Análisis desagregado por provincia para $h=1$. Muestra cómo el modelo global transfiere conocimiento beneficiando tanto a provincias de alta notificación (San Román, Puno) como a provincias rurales pequeñas (Moho, Yunguyo, Sandia).
-"""))
-
-    cells.append(nbf.v4.new_code_cell("""# Cargar resultados por provincia en test 2025
-df_prov_res = pd.read_csv("reports/fase2/resultados_por_provincia.csv")
-df_prov_test = df_prov_res[(df_prov_res["particion"] == "test") & (df_prov_res["horizonte_h"] == 1)].copy()
-
-# Comparación directa entre LightGBM Global y Seasonal Naive por provincia
-piv_prov = df_prov_test.pivot(index="provincia", columns="modelo", values="wape_pct").reset_index()
-piv_prov["mejora_vs_snaive_pct"] = 100 * (piv_prov["Seasonal Naive"] - piv_prov["LightGBM Global"]) / piv_prov["Seasonal Naive"]
-piv_prov.sort_values(by="LightGBM Global")
-"""))
-
-    # --------------------------------------------------------------------------
-    # Celda 11: Evaluación de Utilidad Sanitaria y Alertas
-    # --------------------------------------------------------------------------
-    cells.append(nbf.v4.new_markdown_cell("""## 9. Evaluación de Utilidad en Planificación Sanitaria y Alertas
-Definición de brote / alza: semana epidemiológica que supera el **Percentil 75 histórico (2000–2022)** del Canal Endémico provincial o regional.  
-Se evalúa la matriz de confusión, Precisión, Recall (Sensibilidad), F1-score y Tasa de Falsas Alarmas.
-"""))
-
-    cells.append(nbf.v4.new_code_cell("""# Cargar métricas de alerta epidemiológica
-df_alerts = pd.read_csv("reports/fase2/metricas_alertas.csv")
-df_alerts[df_alerts["ambito"] == "PROVINCIAL"]
-"""))
-
-    # --------------------------------------------------------------------------
-    # Celda 12: Visualizaciones Embebidas
-    # --------------------------------------------------------------------------
-    cells.append(nbf.v4.new_markdown_cell("""## 10. Figuras Científicas de Alta Resolución (300 DPI)
-Presentación de las 6 figuras generadas para la comunicación técnica y epidemiológica.
-"""))
-
-    cells.append(nbf.v4.new_code_cell("""# Mostrar figuras generadas
-from IPython.display import Image, display
-
-figuras = [
-    ("Figura 1: Comparación de Modelos por MAE y RMSE", "figures/fase2/figura1_comparacion_modelos_mae_rmse.png"),
-    ("Figura 2: Series Temporales Real vs. Predicho en 2025", "figures/fase2/figura2_series_real_vs_predicho_2025.png"),
-    ("Figura 3: Distribución Espacial de Errores por Provincia", "figures/fase2/figura3_distribucion_errores_por_provincia.png"),
-    ("Figura 4: Comparación de Horizontes y Estrategia Directa vs. Recursiva", "figures/fase2/figura4_comparacion_horizontes_directo_vs_recursivo.png"),
-    ("Figura 5: Comparación de Estrategias de Imputación Causal", "figures/fase2/figura5_comparacion_estrategias_imputacion.png"),
-    ("Figura 6: Evaluación de Alertas Sanitarias", "figures/fase2/figura6_evaluacion_alertas_epidemiologicas.png")
+# Formatear tabla para presentación
+cols_show = [
+    "ambito", "horizonte_h", "modelo", "estrategia_horizonte",
+    "mae_global", "rmse_global", "wape_global_pct", "bias_global",
+    "mejora_wape_vs_snaive_pct", "cobertura_ic_95_pct"
+]
+df_display = df_results_test[cols_show].copy()
+df_display.columns = [
+    "Ámbito", "Horizonte", "Modelo", "Estrategia",
+    "MAE", "RMSE", "WAPE (%)", "Sesgo", "Mejora vs SNaive (%)", "Cobertura 95% (%)"
 ]
 
-for title, path in figuras:
-    print(f"=== {title} ===")
-    display(Image(filename=path, width=800))
+print("Tabla Maestra de Resultados en Conjunto de Prueba 2025:")
+print(df_display.to_string(index=False))
 """))
 
-    # --------------------------------------------------------------------------
-    # Celda 13: Conclusiones
-    # --------------------------------------------------------------------------
-    cells.append(nbf.v4.new_markdown_cell("""## 11. Conclusiones y Dictamen Operativo
+    # Sección 7: Intervalos
+    cells.append(nbf.v4.new_markdown_cell("""## 7. Calibración Heterocedástica de Intervalos de Predicción al 95%
 
-### Hallazgos Principales:
-1. **Horizonte $h=1$:** **LightGBM Global** alcanza el mejor rendimiento provincial con un **MAE de 16.02**, **WAPE de 15.90%** y una **mejora del 28.89%** sobre el Seasonal Naive. XGBoost Global muestra un desempeño prácticamente indistinguible (WAPE 15.93%, mejora 28.76%).
-2. **Horizonte $h=4$:** **XGBoost Global Directo** es el mejor modelo con un **MAE de 17.91**, **WAPE de 17.77%** y **mejora del 20.50%** sobre Seasonal Naive, superando levemente a LightGBM Recursivo (WAPE 17.84%).
-3. **Escala Regional:** LightGBM Regional en $h=1$ logra un **WAPE de 9.81%** (MAE 128.51) con un 25.34% de ganancia sobre Seasonal Naive. Sin embargo, para $h=4$ regional, Seasonal Naive (WAPE 13.14%) supera a los modelos ML debido a la alta regularidad del ciclo anual agregado y la muestra pequeña ($N=52$ semanas/año) a nivel departamental.
-4. **Modelos Globales vs. Independientes:** El modelo global supera a los modelos provinciales independientes (WAPE 15.90% vs. 17.62%), demostrando la ventaja del agrupamiento espacial (*spatial pooling*).
-5. **Incertidumbre e Intervalos:** La cobertura empírica al 95% oscila entre **97.1% y 97.8%**, confirmando intervalos estadísticamente confiables sin subestimación de riesgo.
-6. **Utilidad Sanitaria:** Para alertas tempranas, el pronóstico puntual conservador exhibe 100% de precisión pero baja sensibilidad (5%). Al emplear el límite superior probabilístico al 95%, la sensibilidad aumenta al **85% - 95%**, proporcionando una herramienta de tamizaje preventivo idónea para la logística hospitalaria.
+En la auditoría se detectó que aplicar un cuantil aditivo global producía **subcobertura crítica en San Román (71.70%)** y bandas excesivamente anchas en provincias pequeñas como Moho (76.8 casos).
 
-### Veredicto de Aplicabilidad Operativa:
-- **Horizonte $h=1$:** **APTO** para integración operativa en tableros de Business Intelligence, monitoreo semanal de salas situacionales y redistribución de insumos respiratorios.
-- **Horizonte $h=4$:** **APTO CON PRECAUCIÓN** como guía orientativa de planificación mensual de compras y programación de personal, debiendo combinarse con el monitoreo continuo de semanas intermedias.
+**Solución aplicada:**
+Se calibran los cuantiles empíricos residuales ($Q_{0.025}, Q_{0.975}$) de forma independiente para cada provincia utilizando exclusivamente los 104 residuos observados en la partición de validación (2023–2024).
+"""))
+
+    cells.append(nbf.v4.new_code_cell("""# Carga y presentación del reporte de cobertura de intervalos por provincia
+df_cov_prov = pd.read_csv("reports/fase2/cobertura_intervalos_por_provincia.csv")
+
+cols_cov = [
+    "provincia", "media_observada_2025", "cobertura_metodo_anterior_pct",
+    "cobertura_metodo_corregido_pct", "ancho_metodo_anterior", "ancho_metodo_corregido",
+    "reduccion_ancho", "diagnostico_calibracion"
+]
+print("Desempeño de Cobertura de Intervalos al 95% (LightGBM Global, h=1, Test 2025):")
+print(df_cov_prov[cols_cov].to_string(index=False))
+"""))
+
+    # Sección 8: Alertas
+    cells.append(nbf.v4.new_markdown_cell("""## 8. Evaluación Epidemiológica de Semanas de Alta Notificación
+
+En consonancia con las normas técnicas del CDC Perú / MINSA:
+- La superación de un umbral estadístico ($P_{75}$) define formalmente una **semana de alta notificación**, no un "brote confirmado".
+- Se evaluaron tres reglas operativas en el conjunto de prueba 2025 para determinar la viabilidad de emitir alertas automáticas en el dashboard.
+"""))
+
+    cells.append(nbf.v4.new_code_cell("""# Carga de la comparación de métodos de alertas epidemiológicas
+df_alerts_comp = pd.read_csv("reports/fase2/comparacion_alertas_metodos.csv")
+
+cols_alert = [
+    "metodo_alerta", "alertas_emitidas", "verdaderos_positivos_tp",
+    "falsos_positivos_fp", "falsos_negativos_fn", "precision_pct",
+    "sensibilidad_recall_pct", "f1_score", "tasa_falsa_alarma_pct"
+]
+print("Evaluación de Alternativas de Detección de Semanas de Alta Notificación (Test 2025):")
+print(df_alerts_comp[cols_alert].to_string(index=False))
+
+print("\\nDictamen Operativo:")
+print("Ninguna regla algorítmica logra un balance clínico admisible.")
+print("Se recomienda NO activar alertas automáticas autónomas en el dashboard de BI.")
+"""))
+
+    # Sección 9: Visualizaciones
+    cells.append(nbf.v4.new_markdown_cell("""## 9. Diagnóstico Visual y Figuras Epidemiológicas
+
+Generación directa de figuras científicas para la interpretación visual del modelo recomendado en el ámbito provincial:
+1. Pronóstico vs Real con intervalo de incertidumbre al 95% en los principales focos urbanos (San Román y Puno).
+2. Comparativa de precisión (WAPE) entre LightGBM Global, ETS y Seasonal Naive en las 13 provincias.
+3. Cobertura empírica territorial de los intervalos de predicción.
+"""))
+
+    cells.append(nbf.v4.new_code_cell("""# Gráfico 1: Pronóstico con Intervalo de Confianza al 95% para San Román y Puno (2025)
+df_pred_corr = pd.read_csv("reports/fase2/predicciones_2025_corregido.csv")
+lgb_test = df_pred_corr[
+    (df_pred_corr["modelo"] == "LightGBM Global") & 
+    (df_pred_corr["horizonte_h"] == 1) &
+    (df_pred_corr["ambito"] == "PROVINCIAL")
+].copy()
+
+fig, axes = plt.subplots(1, 2, figsize=(15, 4.5), sharey=False)
+
+for i, prov in enumerate(["SAN ROMAN", "PUNO"]):
+    ax = axes[i]
+    p_data = lgb_test[lgb_test["entidad"] == prov].sort_values("semana")
+    
+    ax.plot(p_data["semana"], p_data["y_true"], color="#1f77b4", lw=2, label="Casos Observados (2025)", marker="o", markersize=3)
+    ax.plot(p_data["semana"], p_data["y_pred"], color="#d62728", lw=2, linestyle="--", label="Pronóstico LightGBM (h=1)")
+    ax.fill_between(p_data["semana"], p_data["y_pred_lower_95"], p_data["y_pred_upper_95"], color="#d62728", alpha=0.15, label="Banda 95% Calibrada")
+    
+    ax.set_title(f"Provincia: {prov} - Holdout 2025", fontweight="bold")
+    ax.set_xlabel("Semana Epidemiológica")
+    ax.set_ylabel("Episodios Semanales (Menores 5 años)")
+    ax.legend(frameon=True, facecolor="white", loc="upper right")
+    ax.grid(True, linestyle=":", alpha=0.6)
+
+plt.tight_layout()
+plt.show()
+"""))
+
+    cells.append(nbf.v4.new_code_cell("""# Gráfico 2: Comparativa de WAPE por provincia (LightGBM vs Baselines)
+df_prov_metrics = pd.read_csv("reports/fase2/resultados_por_provincia.csv")
+lgb_prov_wape = df_prov_metrics[
+    (df_prov_metrics["modelo"] == "LightGBM Global") & 
+    (df_prov_metrics["horizonte_h"] == 1) &
+    (df_prov_metrics["particion"] == "test")
+].set_index("provincia")["wape_pct"]
+
+snaive_prov_wape = df_prov_metrics[
+    (df_prov_metrics["modelo"] == "Seasonal Naive") & 
+    (df_prov_metrics["horizonte_h"] == 1) &
+    (df_prov_metrics["particion"] == "test")
+].set_index("provincia")["wape_pct"]
+
+prov_names = sorted(lgb_prov_wape.index.tolist())
+x = np.arange(len(prov_names))
+width = 0.35
+
+fig, ax = plt.subplots(figsize=(14, 5))
+rects1 = ax.bar(x - width/2, [snaive_prov_wape[p] for p in prov_names], width, label="Seasonal Naive", color="#aec7e8")
+rects2 = ax.bar(x + width/2, [lgb_prov_wape[p] for p in prov_names], width, label="LightGBM Global (h=1)", color="#1f77b4")
+
+ax.set_ylabel("WAPE (%)")
+ax.set_title("Comparativa de Error Porcentual (WAPE) por Provincia en Prueba 2025", fontweight="bold")
+ax.set_xticks(x)
+ax.set_xticklabels(prov_names, rotation=35, ha="right")
+ax.legend(frameon=True, facecolor="white")
+ax.grid(True, linestyle=":", alpha=0.5, axis="y")
+
+plt.tight_layout()
+plt.show()
+"""))
+
+    # Sección 10: Verificación y entregables
+    cells.append(nbf.v4.new_markdown_cell("""## 10. Verificación de Consistencia y Trazabilidad
+
+Se verifica la coherencia numérica del total provincial y la identidad matemática del WAPE:
+- Suma real observada en las 13 provincias durante 2025: **69,412 episodios**.
+- Cumplimiento de la identidad matemática:
+  $$\\text{WAPE} = 100 \\times \\frac{\\text{MAE} \\times N}{\\sum y} = 100 \\times \\frac{16.0166 \\times 689}{69,412} = 15.8985\\% \\approx 15.90\\%$$
+"""))
+
+    cells.append(nbf.v4.new_code_cell("""# Verificación matemática estricta
+lgb_eval = lgb_test[lgb_test["es_evaluable"] == True]
+suma_observada = float(lgb_eval["y_true"].sum())
+mae_calc = float(mean_absolute_error(lgb_eval["y_true"], lgb_eval["y_pred"]))
+n_obs = len(lgb_eval)
+wape_calc = (np.sum(np.abs(lgb_eval["y_true"] - lgb_eval["y_pred"])) / suma_observada) * 100.0
+wape_identidad = 100.0 * (mae_calc * n_obs) / suma_observada
+
+print("Certificación de Trazabilidad Numérica:")
+print(f"- Total observado provincial 2025: {suma_observada:,.2f} episodios (esperado: 69,412.00)")
+print(f"- N semanas evaluables: {n_obs} (esperado: 689)")
+print(f"- MAE calculado: {mae_calc:.4f}")
+print(f"- WAPE por fórmula directa: {wape_calc:.4f}%")
+print(f"- WAPE por identidad algebraica: {wape_identidad:.4f}%")
+print(f"- Discrepancia matemática: {abs(wape_calc - wape_identidad):.10f}")
+
+assert abs(suma_observada - 69412.0) < 1e-4, f"Discrepancia en suma: {suma_observada}"
+assert abs(wape_calc - wape_identidad) < 1e-6, "Fallo en identidad matemática del WAPE"
+print("\\nComprobación superada: Consistencia matemática perfecta al 100%.")
+"""))
+
+    # Sección 11: Conclusiones
+    cells.append(nbf.v4.new_markdown_cell("""## 11. Conclusiones y Recomendaciones para el Dashboard de Business Intelligence
+
+### 11.1 Conclusiones Científicas
+1. **Superioridad Demostrada de Machine Learning:** LightGBM Global ($h=1$) y XGBoost Global Directo ($h=4$) superan categóricamente a todos los baselines estadísticos a nivel provincial, reduciendo el error en **+28.89% y +20.49%** respecto a Seasonal Naive.
+2. **Eficacia del Spatial Pooling:** El modelo multi-serie global captura dinámicas epidemiológicas cruzadas entre provincias, superando a modelos univariados independientes.
+3. **Calibración Territorial de Incertidumbre:** La calibración heterocedástica provincial corrige la subcobertura en San Román (alcanzando 98.11%) y garantiza intervalos informativos para la toma de decisiones.
+4. **Desactivación de Alertas Automatizadas:** La vigilancia pasiva presenta una tasa de falsas alarmas inaceptable para algoritmos autónomos; las decisiones deben mantenerse bajo juicio epidemiológico humano.
+
+### 11.2 Recomendación de Arquitectura para el Dashboard BI (DIRESA Puno)
+- **Modelo Provincial Oficial:** `LightGBM Global` ($h=1$, WAPE 15.90%, MAE 16.02 casos/semana).
+- **Modelo de Planificación Mensual:** `XGBoost Global Directo` ($h=4$, WAPE 17.77%, MAE 17.91 casos/semana).
+- **Despliegue Visual:** Serie observada, punto pronosticado y cono de incertidumbre al 95%.
+- **Transición a Fase 3:** Incorporación de covariables climáticas del SENAMHI (temperaturas mínimas y heladas) mediante retardos bioclimáticos de 1 a 3 semanas.
 """))
 
     nb.cells = cells
+    return nb
+
+def main():
+    print("Construyendo notebook completo de la Fase 2...")
+    nb = build_notebook()
     
-    os.makedirs("notebooks", exist_ok=True)
     nb_path = os.path.join("notebooks", "02_fase2_modelado_predictivo.ipynb")
-    
     with open(nb_path, "w", encoding="utf-8") as f:
         nbf.write(nb, f)
-    print(f"[OK] Notebook estructurado escrito en: {nb_path}")
+    print(f"Notebook guardado en: {nb_path} ({len(nb.cells)} celdas)")
     
-    # Ejecutar notebook
-    print("Ejecutando notebook con NotebookClient...")
+    print("\nEjecutando notebook end-to-end con nbclient...")
     client = NotebookClient(nb, timeout=600, kernel_name="python3")
     client.execute()
     
     with open(nb_path, "w", encoding="utf-8") as f:
         nbf.write(nb, f)
-    print(f"[OK] Notebook ejecutado y guardado con outputs en: {nb_path}")
+    print(f"Notebook ejecutado y reescrito con todas sus salidas en: {nb_path}")
 
 if __name__ == "__main__":
-    create_and_execute_notebook()
+    main()

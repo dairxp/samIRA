@@ -23,9 +23,7 @@ print(f"Dataset cargado con éxito: {df.shape[0]:,} filas, {df.shape[1]} columna
 # Color palette
 PALETTE = sns.color_palette("tab10")
 
-# ==============================================================================
 # FIGURA 1: Evolución Anual y Serie Temporal Semanal Regional de IRA no neumonía
-# ==============================================================================
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10))
 
 # 1A. Casos anuales totales
@@ -70,9 +68,7 @@ plt.close()
 print("Generada: figures/fig01_evolucion_anual_semanal_ira.png")
 
 
-# ==============================================================================
 # FIGURA 2: Estacionalidad por Semana Epidemiológica (Ciclo Anual Típico)
-# ==============================================================================
 fig, ax = plt.subplots(figsize=(13, 6))
 
 # Aggregate weekly regional cases per year-week
@@ -111,9 +107,7 @@ plt.close()
 print("Generada: figures/fig02_estacionalidad_semanal_ira.png")
 
 
-# ==============================================================================
 # FIGURA 3: Comparación entre las 13 Provincias de Puno
-# ==============================================================================
 fig, ax = plt.subplots(figsize=(12, 7))
 
 prov_ira = df.groupby("provincia")["ira_no_neumonia"].sum().sort_values(ascending=True)
@@ -141,9 +135,7 @@ plt.close()
 print("Generada: figures/fig03_comparacion_13_provincias_ira.png")
 
 
-# ==============================================================================
 # FIGURA 4: Distribución y Valores Extremos Semanales por Provincia (Boxplots)
-# ==============================================================================
 fig, ax = plt.subplots(figsize=(14, 7))
 
 # Aggregate by provincia, ano, semana
@@ -184,9 +176,7 @@ plt.close()
 print("Generada: figures/fig04_distribucion_episodios_boxplot.png")
 
 
-# ==============================================================================
 # FIGURA 5: Comparación Histórica: Pre-Pandemia, Pandemia y Post-Pandemia
-# ==============================================================================
 fig, ax = plt.subplots(figsize=(13, 6))
 
 df_periods = df.copy()
@@ -220,9 +210,7 @@ plt.close()
 print("Generada: figures/fig05_impacto_covid_periodos.png")
 
 
-# ==============================================================================
 # FIGURA 6: Evolución Separada de Neumonías, Hospitalizados y Defunciones
-# ==============================================================================
 fig, axes = plt.subplots(3, 1, figsize=(14, 11), sharex=True)
 
 annual_severe = df.groupby("ano").agg(
@@ -267,9 +255,7 @@ plt.close()
 print("Generada: figures/fig06_evolucion_neumonias_hosp_def.png")
 
 
-# ==============================================================================
 # FIGURA 7: Proporción de Ceros por Variable y Período
-# ==============================================================================
 fig, ax = plt.subplots(figsize=(13, 6))
 
 indicators = [
@@ -322,9 +308,7 @@ plt.close()
 print("Generada: figures/fig07_proporcion_ceros_periodo.png")
 
 
-# ==============================================================================
 # FIGURA 8: Matriz de Correlación entre Indicadores Numéricos
-# ==============================================================================
 fig, (ax_p, ax_s) = plt.subplots(1, 2, figsize=(15, 6))
 
 corr_cols = [

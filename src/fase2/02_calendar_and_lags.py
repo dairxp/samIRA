@@ -1,8 +1,6 @@
 """
-================================================================================
 MÓDULO: ALINEACIÓN TEMPORAL DEL CALENDARIO EPIDEMIOLÓGICO Y RETARDOS ESTACIONALES
 Proyecto samIRA - Fase 2
-================================================================================
 """
 
 import os

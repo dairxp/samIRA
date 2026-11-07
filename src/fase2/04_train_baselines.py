@@ -1,8 +1,6 @@
 """
-================================================================================
 MÓDULO: IMPLEMENTACIÓN Y EVALUACIÓN DE MODELOS BASELINE DE REFERENCIA
 Proyecto samIRA - Fase 2
-================================================================================
 Implementa los tres modelos de referencia obligatorios:
   1. Naive (Último valor observado en el origen del pronóstico).
   2. Seasonal Naive (Alineación por calendario epidemiológico y-1, w+h).
@@ -66,9 +64,7 @@ def run_baselines_evaluation():
     baseline_records = []
     detailed_preds = []
     
-    # --------------------------------------------------------------------------
     # A. MODELOS BASELINE A NIVEL PROVINCIAL (13 Provincias)
-    # --------------------------------------------------------------------------
     provincias = sorted(df_prov["provincia"].unique())
     horizons = [1, 4]
     partitions = ["val", "test"] # val: 2023-2024, test: 2025
@@ -168,9 +164,7 @@ def run_baselines_evaluation():
                     "pred_ets": pred_ets
                 })
                 
-    # --------------------------------------------------------------------------
     # B. MODELOS BASELINE A NIVEL REGIONAL
-    # --------------------------------------------------------------------------
     reg_df_sorted = df_reg.sort_values(by=["ano", "semana"]).reset_index(drop=True)
     causal_reg_series = reg_df_sorted["ira_no_neumonia"].ffill()
     
@@ -256,9 +250,7 @@ def run_baselines_evaluation():
             
     df_all_preds = pd.DataFrame(detailed_preds)
     
-    # --------------------------------------------------------------------------
     # C. CÁLCULO DE MÉTRICAS CONSOLIDADAS
-    # --------------------------------------------------------------------------
     # Métricas calculadas ÚNICAMENTE donde es_evaluable == True
     eval_preds = df_all_preds[df_all_preds["es_evaluable"] == True].copy()
     

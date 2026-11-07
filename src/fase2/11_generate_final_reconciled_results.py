@@ -1,6 +1,5 @@
 """
 FASE 2 - GENERACIÓN DE RESULTADOS FINALES RECONCILIADOS Y CORREGIDOS
-===================================================================
 1. Integra las predicciones reparadas de ETS / Holt-Winters (sin duplicación de Seasonal Naive).
 2. Conserva intactos los modelos y predicciones de LightGBM y XGBoost (sin reentrenamiento).
 3. Aplica la calibración de intervalos de predicción al 95% heterocedástica por provincia

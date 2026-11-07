@@ -1,8 +1,6 @@
 """
-================================================================================
 MÓDULO: ENTRENAMIENTO Y EVALUACIÓN FINAL DE MODELOS ML Y BASELINES
 Proyecto samIRA - Fase 2
-================================================================================
 Entrena y evalúa todos los modelos para h=1 y h=4 (Directo y Recursivo):
   - Modelos Baselines: Naive, Seasonal Naive, ETS
   - Modelos ML Globales: LightGBM y XGBoost
@@ -129,9 +127,7 @@ def main():
         "seasonal_lag_1y", "sin_semana", "cos_semana", "es_pandemia"
     ]
     
-    # --------------------------------------------------------------------------
     # MODELO GLOBAL PROVINCIAL (h=1)
-    # --------------------------------------------------------------------------
     print("\n[1/5] Entrenando Modelos Globales Provinciales para h=1...")
     df_p1, df_r1 = prepare_feature_dataset(horizon=1, is_direct=True)
     
@@ -253,9 +249,7 @@ def main():
             "y_pred_upper_95": max(0.0, float(test_preds_xgb1[i] + q975_xgb1))
         })
         
-    # --------------------------------------------------------------------------
     # MODELOS INDEPENDIENTES POR PROVINCIA (h=1)
-    # --------------------------------------------------------------------------
     print("\n[2/5] Entrenando Modelos Independientes por Provincia (LightGBM h=1)...")
     indep_val_preds = []
     indep_test_preds = []
@@ -311,9 +305,7 @@ def main():
                 "y_pred_upper_95": max(0.0, float(pt_preds[idx] + q975_indep))
             })
             
-    # --------------------------------------------------------------------------
     # MODELO GLOBAL PROVINCIAL (h=4 DIRECTO)
-    # --------------------------------------------------------------------------
     print("\n[3/5] Entrenando Modelos Globales Provinciales para h=4 (Directo)...")
     df_p4, df_r4 = prepare_feature_dataset(horizon=4, is_direct=True)
     
@@ -429,9 +421,7 @@ def main():
             "y_pred_upper_95": max(0.0, float(test_preds_xgb4[i] + q975_xgb4))
         })
 
-    # --------------------------------------------------------------------------
     # MODELO GLOBAL PROVINCIAL (h=4 RECURSIVO con LightGBM)
-    # --------------------------------------------------------------------------
     print("\n[4/5] Evaluando Estrategia Recursiva para h=4 con LightGBM...")
     # Para recursivo: desde cada origen t, predecimos t+1, actualizamos lag_1, lag_2, ..., predecimos t+2, t+3, t+4.
     # Evaluamos sobre las semanas de test y val
@@ -503,9 +493,7 @@ def main():
                     "y_pred_upper_95": max(0.0, curr_pred + q975_lgb4)
                 })
 
-    # --------------------------------------------------------------------------
     # MODELOS REGIONALES AGREGADOS (h=1 y h=4)
-    # --------------------------------------------------------------------------
     print("\n[5/5] Entrenando Modelos Regionales Agregados (LightGBM h=1 y h=4)...")
     reg_train1 = df_r1[(df_r1["ano"].between(2001, 2022)) & (df_r1["target_es_evaluable"] == True)]
     reg_val1 = df_r1[(df_r1["target_ano"].between(2023, 2024)) & (df_r1["target_es_evaluable"] == True)]
@@ -608,9 +596,7 @@ def main():
             "y_pred_upper_95": max(0.0, float(t_preds_r4[i] + q975_reg4))
         })
 
-    # ==========================================================================
     # CONSOLIDACIÓN Y EXPORTACIÓN DE TABLAS DE RESULTADOS
-    # ==========================================================================
     df_pred_final = pd.DataFrame(all_predictions)
     
     # Exportar predicciones detalladas

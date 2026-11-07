@@ -1,8 +1,6 @@
 """
-================================================================================
 MÓDULO: PIPELINE CAUSAL DE INGENIERÍA DE CARACTERÍSTICAS (FEATURE ENGINEERING)
 Proyecto samIRA - Fase 2
-================================================================================
 Genera matrices de características para horizontes h=1 y h=4 (Directo y Recursivo):
   - Causalidad estricta: ninguna variable utiliza información posterior al origen t.
   - Imputación causal de soporte C (Media móvil retrospectiva / LOCF) para retardos de entrada.
@@ -38,9 +36,7 @@ def prepare_feature_dataset(horizon: int = 1, is_direct: bool = True) -> tuple[p
     df_prov = pd.read_parquet(prov_path)
     df_reg = pd.read_parquet(reg_path)
     
-    # --------------------------------------------------------------------------
     # 1. Procesamiento Provincial
-    # --------------------------------------------------------------------------
     prov_lookup = df_prov.set_index(["provincia", "ano", "semana"])["ira_no_neumonia"].to_dict()
     
     prov_dfs = []
@@ -123,9 +119,7 @@ def prepare_feature_dataset(horizon: int = 1, is_direct: bool = True) -> tuple[p
     final_prov_df = pd.concat(prov_dfs, ignore_index=True)
     final_prov_df["provincia"] = final_prov_df["provincia"].astype("category")
     
-    # --------------------------------------------------------------------------
     # 2. Procesamiento Regional
-    # --------------------------------------------------------------------------
     reg_lookup = df_reg.set_index(["ano", "semana"])["ira_no_neumonia"].to_dict()
     reg_sorted = df_reg.sort_values(by=["ano", "semana"]).reset_index(drop=True)
     raw_reg_target = reg_sorted["ira_no_neumonia"].copy()

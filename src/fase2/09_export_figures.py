@@ -1,6 +1,5 @@
 """
 FASE 2 - GENERACIÓN DE FIGURAS CIENTÍFICAS DE ALTA RESOLUCIÓN (300 DPI)
-======================================================================
 Genera las 6 figuras requeridas para el informe científico de la Fase 2:
 1. figura1_comparacion_modelos_mae_rmse.png
 2. figura2_series_real_vs_predicho_2025.png
