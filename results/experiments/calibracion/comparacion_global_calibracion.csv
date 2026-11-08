@@ -1,0 +1,5 @@
+﻿Modelo,h,Cob_Orig (%),Cob_Calib (%),Dif_Cob (p.p.),Ancho_Medio_Orig,Ancho_Medio_Calib,Reduccion_Ancho (%),Ancho_Mediano_Orig,Ancho_Mediano_Calib,Winkler_Orig,Winkler_Calib,Mejora_Winkler (%),N
+LightGBM Global,1,97.24,96.66,-0.58,117.03,99.01,15.4,128.95,77.7,150.51,112.89,25.0,689
+LightGBM Global Directo,4,96.37,97.82,1.45,138.88,125.32,9.76,144.63,95.68,174.29,132.82,23.79,689
+XGBoost Global,1,97.24,96.95,-0.29,115.35,101.67,11.86,126.95,77.1,140.64,111.97,20.39,689
+XGBoost Global Directo,4,96.95,97.39,0.44,142.8,124.9,12.54,148.23,96.35,178.45,137.17,23.13,689

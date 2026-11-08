@@ -1,0 +1,9 @@
+﻿Modelo,h,Objetivo,WAPE (%),MAE,RMSE,Bias,Desviancia Poisson,% Negativos,Tiempo (s)
+LightGBM Global,1,Original (L2 / MSE),18.247,19.328,30.317,1.692,6.773,0.0,0.16
+LightGBM Global,1,Poisson,18.452,19.545,30.926,2.394,6.958,0.0,0.16
+XGBoost Global,1,Original (L2 / MSE),18.563,19.663,31.821,1.102,6.975,0.0,0.26
+XGBoost Global,1,Poisson,18.631,19.735,31.554,1.477,7.092,0.0,0.22
+LightGBM Global Directo,4,Original (L2 / MSE),23.135,24.506,39.322,4.981,10.145,0.0,0.11
+LightGBM Global Directo,4,Poisson,23.254,24.632,39.181,4.763,10.33,0.0,0.15
+XGBoost Global Directo,4,Original (L2 / MSE),23.236,24.613,39.818,3.512,10.369,0.0,0.18
+XGBoost Global Directo,4,Poisson,23.341,24.724,39.785,2.927,10.598,0.0,0.2
