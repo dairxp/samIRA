@@ -1,0 +1,12 @@
+﻿Particion,Horizonte_h,Modelo,MAE,RMSE,WAPE (%),Bias,N
+test,1,XGBoost Global,15.835,23.31,15.718,2.931,689
+test,1,LightGBM Global,16.258,24.475,16.138,3.042,689
+test,1,ETS / Holt-Winters,17.62,25.908,17.49,-0.016,689
+test,1,LightGBM Independiente,17.86,26.528,17.728,4.624,689
+test,1,Naive,19.836,28.321,19.69,0.437,689
+test,1,Seasonal Naive,22.522,33.73,22.356,6.383,689
+test,4,XGBoost Global Directo,19.113,29.651,18.972,6.466,689
+test,4,LightGBM Global Directo,19.347,30.177,19.205,7.469,689
+test,4,ETS / Holt-Winters,21.776,33.105,21.616,-0.684,689
+test,4,Seasonal Naive,22.522,33.73,22.356,6.383,689
+test,4,Naive,24.824,39.454,24.641,-0.038,689

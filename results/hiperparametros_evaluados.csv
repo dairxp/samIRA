@@ -1,0 +1,21 @@
+﻿Algoritmo,Horizonte_h,Config_ID,Parametros,WAPE_Val_pct
+LightGBM,1,LGB_1,"{'n_estimators': 100, 'learning_rate': 0.05, 'num_leaves': 31, 'subsample': 0.8}",18.407
+LightGBM,1,LGB_2,"{'n_estimators': 200, 'learning_rate': 0.03, 'num_leaves': 31, 'subsample': 0.8}",18.288
+LightGBM,1,LGB_3,"{'n_estimators': 200, 'learning_rate': 0.05, 'num_leaves': 31, 'subsample': 1.0}",18.247
+LightGBM,1,LGB_4,"{'n_estimators': 300, 'learning_rate': 0.03, 'num_leaves': 15, 'subsample': 0.8}",18.363
+LightGBM,1,LGB_5,"{'n_estimators': 300, 'learning_rate': 0.05, 'num_leaves': 63, 'subsample': 0.8}",18.446
+XGBoost,1,XGB_1,"{'n_estimators': 100, 'learning_rate': 0.05, 'max_depth': 4, 'subsample': 0.8}",18.872
+XGBoost,1,XGB_2,"{'n_estimators': 200, 'learning_rate': 0.03, 'max_depth': 4, 'subsample': 0.8}",18.845
+XGBoost,1,XGB_3,"{'n_estimators': 200, 'learning_rate': 0.05, 'max_depth': 6, 'subsample': 1.0}",18.563
+XGBoost,1,XGB_4,"{'n_estimators': 300, 'learning_rate': 0.03, 'max_depth': 4, 'subsample': 0.8}",18.716
+XGBoost,1,XGB_5,"{'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 6, 'subsample': 0.8}",18.608
+LightGBM,4,LGB_1,"{'n_estimators': 100, 'learning_rate': 0.05, 'num_leaves': 31, 'subsample': 0.8}",23.345
+LightGBM,4,LGB_2,"{'n_estimators': 200, 'learning_rate': 0.03, 'num_leaves': 31, 'subsample': 0.8}",23.282
+LightGBM,4,LGB_3,"{'n_estimators': 200, 'learning_rate': 0.05, 'num_leaves': 31, 'subsample': 1.0}",23.287
+LightGBM,4,LGB_4,"{'n_estimators': 300, 'learning_rate': 0.03, 'num_leaves': 15, 'subsample': 0.8}",23.135
+LightGBM,4,LGB_5,"{'n_estimators': 300, 'learning_rate': 0.05, 'num_leaves': 63, 'subsample': 0.8}",23.602
+XGBoost,4,XGB_1,"{'n_estimators': 100, 'learning_rate': 0.05, 'max_depth': 4, 'subsample': 0.8}",23.661
+XGBoost,4,XGB_2,"{'n_estimators': 200, 'learning_rate': 0.03, 'max_depth': 4, 'subsample': 0.8}",23.48
+XGBoost,4,XGB_3,"{'n_estimators': 200, 'learning_rate': 0.05, 'max_depth': 6, 'subsample': 1.0}",23.371
+XGBoost,4,XGB_4,"{'n_estimators': 300, 'learning_rate': 0.03, 'max_depth': 4, 'subsample': 0.8}",23.236
+XGBoost,4,XGB_5,"{'n_estimators': 300, 'learning_rate': 0.05, 'max_depth': 6, 'subsample': 0.8}",23.259

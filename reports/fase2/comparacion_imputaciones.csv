@@ -1,5 +1,0 @@
-﻿codigo_estrategia,descripcion_estrategia,filas_train,filas_val_evaluables,mae_val,rmse_val,wape_val_pct,bias_val
-A,"A. Retardo Estacional Homólogo (y-1, w)",14785,1347,19.818,31.144,18.709,2.572
-B,B. LOCF (Último Valor Observado Pasado),14785,1347,19.808,31.152,18.7,2.546
-C,C. Media Móvil Retrospectiva Causal,14785,1347,19.794,31.235,18.686,2.538
-D,D. Tratamiento Nativo con NaN + Bandera,14785,1347,19.906,31.329,18.792,2.825

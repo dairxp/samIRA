@@ -1,0 +1,23 @@
+﻿Particion,Horizonte_h,Modelo,Precisión,Recall,F1-Score,Total Alertas Reales
+test,1,ETS / Holt-Winters,0.6,0.231,0.333,13
+test,1,LightGBM Global,0.5,0.385,0.435,13
+test,1,LightGBM Independiente,0.5,0.538,0.519,13
+test,1,Naive,0.308,0.308,0.308,13
+test,1,Seasonal Naive,0.171,0.538,0.259,13
+test,1,XGBoost Global,0.7,0.538,0.609,13
+test,4,ETS / Holt-Winters,0.1,0.077,0.087,13
+test,4,LightGBM Global Directo,0.381,0.615,0.471,13
+test,4,Naive,0.385,0.385,0.385,13
+test,4,Seasonal Naive,0.171,0.538,0.259,13
+test,4,XGBoost Global Directo,0.348,0.615,0.444,13
+val,1,ETS / Holt-Winters,0.375,0.222,0.279,81
+val,1,LightGBM Global,0.463,0.309,0.37,81
+val,1,LightGBM Independiente,0.315,0.284,0.299,81
+val,1,Naive,0.309,0.309,0.309,81
+val,1,Seasonal Naive,0.188,0.111,0.14,81
+val,1,XGBoost Global,0.444,0.296,0.356,81
+val,4,ETS / Holt-Winters,0.167,0.099,0.124,81
+val,4,LightGBM Global Directo,0.306,0.321,0.313,81
+val,4,Naive,0.185,0.185,0.185,81
+val,4,Seasonal Naive,0.188,0.111,0.14,81
+val,4,XGBoost Global Directo,0.309,0.309,0.309,81

@@ -2270,7 +2270,7 @@ wheels = [
 [[package]]
 name = "samira"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "charset-normalizer" },
     { name = "ipykernel" },
