@@ -1,46 +1,30 @@
 # samIRA: Vigilancia Epidemiológica y Pronóstico de Infecciones Respiratorias Agudas en Puno
 
+**Aplicación desplegada:** https://dairdev.shinyapps.io/samira/
+
+Proyecto de investigación científica aplicada para la auditoría, análisis exploratorio y pronóstico epidemiológico de episodios de Infecciones Respiratorias Agudas (IRA no neumonía) en las 13 provincias del departamento de Puno, Perú (2000–2025).
+
+---
+# samIRA: Vigilancia Epidemiológica y Pronóstico de Infecciones Respiratorias Agudas en Puno
+
+**Aplicación desplegada:** https://dairdev.shinyapps.io/samira/
+
 Proyecto de investigación científica aplicada para la auditoría, análisis exploratorio y pronóstico epidemiológico de episodios de Infecciones Respiratorias Agudas (IRA no neumonía) en las 13 provincias del departamento de Puno, Perú (2000–2025).
 
 ---
 
-## 1. Estructura del Repositorio
+## Acceso Rápido
 
-El repositorio está organizado conforme a estándares de reproducibilidad académica:
-
-```text
-samIRA/
-├── data/
-│   ├── raw/
-│   │   └── datos_abiertos_vigilancia_iras_2000_2025 PUNO.csv # Registro oficial MINSA NotiSP
-│   └── processed/
-│       ├── datos_iras_puno_limpio.parquet                # Dataset curado a nivel de registro
-│       ├── panel_semanal_provincial_puno.parquet         # Panel balanceado (13 provincias x 1,357 semanas)
-│       └── panel_semanal_regional_puno.parquet           # Panel agregado departamental (1,357 semanas)
-├── notebooks/
-│   ├── 01_limpieza_eda.ipynb                             # Auditoría, curación geográfica y EDA
-│   ├── 02_modelado_evaluacion.ipynb                      # Modelos ML, baselines, optimización y evaluación
-│   └── 03_reporting_analitico.ipynb                      # Reporting: analítica descriptiva, diagnóstica, predictiva y prescriptiva
-├── models/
-│   ├── lgbm_global_h1.joblib                             # LightGBM Global h=1
-│   ├── lgbm_global_h4_direct.joblib                      # LightGBM Global h=4 Directo (corregido)
-│   ├── xgboost_global_h1.joblib                          # XGBoost Global h=1
-│   └── xgboost_global_h4_direct.joblib                   # XGBoost Global h=4 Directo (corregido)
-├── results/
-│   ├── predicciones_completas.parquet                    # Predicciones de todos los modelos
-│   ├── predicciones_completas.csv                        # Predicciones unificadas en formato tabular
-│   ├── metricas_validacion_modelos.csv                   # MAE, RMSE, WAPE y Bias en Validación (2023–2024)
-│   ├── metricas_prueba_2025.csv                          # MAE, RMSE, WAPE y Bias en Prueba (2025)
-│   ├── cobertura_intervalos_95.csv                       # Cobertura empírica de intervalos al 95%
-│   └── evaluacion_alertas_epidemiologicas.csv            # Detección de brotes epidémicos (P75)
-├── pyproject.toml                                        # Dependencias y configuración del entorno
-├── uv.lock                                               # Resolución determinista de paquetes
-└── README.md                                             # Documentación de reproducción
-```
+| Recurso | Enlace |
+|---|---|
+| Dashboard interactivo (producción) | https://dairdev.shinyapps.io/samira/ |
+| Cuadernos reproducibles | `notebooks/01–03` |
+| Métricas y predicciones | `results/` |
+| Modelos entrenados | `models/` |
 
 ---
 
-## 2. Requisitos e Instalación
+## Requisitos e Instalación
 
 El proyecto utiliza [`uv`](https://docs.astral.sh/uv/) como gestor de paquetes y entornos virtuales sobre **Python 3.12**.
 
@@ -56,9 +40,27 @@ uv sync
 
 ---
 
-## 3. Ejecución de los Cuadernos de Investigación
+## Dashboard Interactivo (Shiny for Python)
 
-Todo el código analítico, transformaciones, verificaciones con `assert`, tablas y figuras reside directamente dentro de los cuadernos Jupyter en `notebooks/`.
+La aplicación `samIRA` proporciona una interfaz estilo **AdminLTE sólido** para la exploración interactiva y operacional de los resultados sin recalcular modelos ni inventar métricas:
+
+- **Estilo visual:** Sin gradientes, botones cuadrados (`border-radius: 0-2px`), paleta sobria (#1f4e79, #2e86ab, #28a745, #ffc107, #dc3545), cards con elevación mínima.
+- **M1 · Panorama:** Evolución histórica 2000–2025, concentración territorial, mapa geoespacial con centroides de las 13 provincias y ciclo estacional con banda crítica de heladas (SE 20–32).
+- **M2 · Diagnóstico:** Comparación cuantitativa por períodos históricos (Pre-pandemia: 1,889.6, Pandemia: 728.7, Post-pandemia: 1,350.9) y Razón Varianza/Media (VMR) provincial.
+- **M3 · Pronóstico:** Serie temporal 2025 (real vs. pronóstico con intervalos de incertidumbre), benchmark WAPE de modelos, WAPE provincial con semáforo y análisis de estabilidad temporal Rolling-Origin (2020–2024).
+- **M4 · Incertidumbre y Escenarios:** Calibración conformal de intervalos nominales al 95% y simulación interactiva de brechas de demanda vs. capacidad asistencial con umbral parametrizable.
+
+### Ejecución Local
+```bash
+uv run shiny run --reload app.py
+```
+La aplicación iniciará automáticamente en `http://127.0.0.1:8000`.
+
+---
+
+## Ejecución de los Cuadernos de Investigación
+
+Todo el código analítico de base, curación, modelado y exportación de artefactos reside en `notebooks/`.
 
 ### Opción A: Ejecución Interactiva en Jupyter
 ```bash
@@ -69,21 +71,7 @@ Abra y ejecute en orden secuencial:
 2. `notebooks/02_modelado_evaluacion.ipynb`
 3. `notebooks/03_reporting_analitico.ipynb`
 
-### Opción B: Ejecución Completa por Línea de Comandos
-```bash
-# Ejecutar Cuaderno 01 (Auditoría, curación y exportación de paneles Parquet)
-uv run jupyter nbconvert --to notebook --execute --inplace notebooks/01_limpieza_eda.ipynb
-
-# Ejecutar Cuaderno 02 (Ajuste de modelos, validación causal, optimización y exportación de resultados)
-uv run jupyter nbconvert --to notebook --execute --inplace notebooks/02_modelado_evaluacion.ipynb
-
-# Ejecutar Cuaderno 03 (Reporting integral: analítica descriptiva, diagnóstica, predictiva y prescriptiva)
-uv run jupyter nbconvert --to notebook --execute --inplace notebooks/03_reporting_analitico.ipynb
-```
-
----
-
-## 4. Metodología Científica y Correcciones Críticas
+## Metodología Científica y Correcciones Críticas
 
 ### A. Preservación Estricta de Faltantes
 - Se identificaron exactamente **153 semanas sin notificación** en el sistema NotiSP MINSA.
@@ -98,7 +86,7 @@ uv run jupyter nbconvert --to notebook --execute --inplace notebooks/03_reportin
 - Las armónicas de Fourier se computan sobre la **semana objetivo** $w_{t+h}$ para representar fielmente la fase estacional a predecir.
 - Los modelos para $h=4$ fueron reentrenados y evaluados bajo esta partición estricta sin fugas.
 
-### C. Reporting y las Cuatro Analíticas (Cuaderno 03)
+### C. Reporting y las Cuatro Analíticas
 - **Descriptiva:** Caracterización multianual y territorial (2000–2025, 2,297,378 casos) en 13 provincias.
 - **Diagnóstica:** Patrones temporales e interanuales, shock COVID-19 (2020), y separación estricta entre hechos, asociaciones e hipótesis no comprobables.
 - **Predictiva:** Proyecciones out-of-sample en $h=1$ y $h=4$ directo con intervalos de predicción al 95%.
@@ -106,7 +94,7 @@ uv run jupyter nbconvert --to notebook --execute --inplace notebooks/03_reportin
 
 ---
 
-## 5. Resumen de Desempeño Predictivo
+## Resumen de Desempeño Predictivo
 
 Métricas calculadas exclusivamente sobre observaciones evaluables (`es_evaluable == True`):
 

@@ -1,0 +1,7 @@
+# Dependencias para despliegue de samIRA en shinyapps.io y Posit Connect
+shiny>=1.0.0
+shinywidgets>=0.3.0
+plotly>=5.20.0
+pandas>=2.2.0
+pyarrow>=15.0.0
+numpy>=1.26.0

@@ -17,9 +17,12 @@ dependencies = [
     "nbformat>=5.11.1",
     "numpy>=2.5.4",
     "pandas>=3.1.1",
+    "plotly>=5.20.0",
     "pyarrow>=26.0.1",
     "scikit-learn>=1.9.1",
     "seaborn>=0.13.2",
+    "shiny>=1.0.0",
+    "shinywidgets>=0.3.0",
     "statsmodels>=0.15.0",
     "xgboost>=3.4.1",
 ]

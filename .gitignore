@@ -105,3 +105,9 @@ $RECYCLE.BIN/
 *.swp
 *.swo
 *~
+
+# Metadatos de despliegue de rsconnect (generados localmente)
+rsconnect/
+rsconnect-python/
+rsconnect-python.json
+samIRA.json
