@@ -1,14 +1,5 @@
 # samIRA: Vigilancia Epidemiológica y Pronóstico de Infecciones Respiratorias Agudas en Puno
 
-**Aplicación desplegada:** https://dairdev.shinyapps.io/samira/
-
-Proyecto de investigación científica aplicada para la auditoría, análisis exploratorio y pronóstico epidemiológico de episodios de Infecciones Respiratorias Agudas (IRA no neumonía) en las 13 provincias del departamento de Puno, Perú (2000–2025).
-
----
-# samIRA: Vigilancia Epidemiológica y Pronóstico de Infecciones Respiratorias Agudas en Puno
-
-**Aplicación desplegada:** https://dairdev.shinyapps.io/samira/
-
 Proyecto de investigación científica aplicada para la auditoría, análisis exploratorio y pronóstico epidemiológico de episodios de Infecciones Respiratorias Agudas (IRA no neumonía) en las 13 provincias del departamento de Puno, Perú (2000–2025).
 
 ---
